@@ -1,7 +1,7 @@
 <div>
   <ul>
   {{#each item in model}}
-    <li>{{#linkTo 'users.statuses' item.id}}{{item.name}}{{/linkTo}}</li>
+    <li>{{item.user}} &mdash; {{item.statuses.0.status}}</li>
   {{/each}}
   </ul>
 </div>

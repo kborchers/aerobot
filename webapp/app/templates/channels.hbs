@@ -1,7 +1,13 @@
+<h1>AeroBot</h1>
+<ul>
+    <li><a href="#/channels">Channels</a></li>
+    <li><a href="#/karma">Karma</a></li>
+</ul>
+<h2>Channels</h2>
 <div>
   <ul>
   {{#each item in model}}
-    <li>{{#linkTo 'users' item.id}}{{item.name}}{{/linkTo}}</li>
+    <li>{{#linkTo 'channel' item}}{{item.name}}{{/linkTo}}</li>
   {{/each}}
   </ul>
 </div>

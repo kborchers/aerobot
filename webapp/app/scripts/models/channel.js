@@ -1,34 +1,41 @@
 App.Channel = Ember.Object.extend();
 
 App.Channel.reopenClass({
-    find: function() {
-        // If we've already loaded the list, return it
-        if (this._list) { return this._list; }
+    channels: Ember.ArrayProxy.create({ content: [] }),
+    statuses: Ember.ArrayProxy.create({ content: [] }),
+    channelPipe: AeroGear.Pipeline({
+        name: "statuses",
+        settings: {
+            baseURL: "http://api.aerobot.qmx.me/"
+        }
+    }).pipes.statuses,
 
-        // Remember what we've created so we don't request it twice.
-        this._list = [
-            {
-                id: 1,
-                name: "#aerobot-test",
-                users: [
-                    {
-                        id: 1,
-                        name: "qmx",
-                        statuses: [
-                            { id: 1, status: "test" }
-                        ]
-                    },
-                    {
-                        id: 2,
-                        name: "kborchers",
-                        statuses: [
-                            { id: 1, status: "test1" },
-                            { id: 2, status: "test2" }
-                        ]
-                    }
-                ]
+    find: function() {
+        var that = this;
+        this.channelPipe.read({
+            success: function( data ) {
+                that.channels.clear();
+                data["aerobot:status"]["irc.freenode.net"].channels.forEach( function( item ) {
+                    that.channels.pushObject( App.Channel.create( { id: item.channel, name: item.channel } ) );
+                });
             }
-        ];
-        return this._list;
+        });
+
+        return this.channels;
+    },
+
+    findStatusesById: function(channel) {
+        var that = this;
+        this.channelPipe.read({
+            id: "irc.freenode.net/" + channel,
+            success: function( data ) {
+                that.statuses.clear();
+                data.users.forEach( function( item ) {
+                    that.statuses.pushObject( App.Channel.create( item ) );
+                });
+            }
+        });
+
+        return this.statuses;
     }
 });
